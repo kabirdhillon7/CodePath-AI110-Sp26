@@ -114,6 +114,6 @@ When you finish, Playlist Chaos will feel more predictable, and you will have ta
 
 ---
 
-# Tech Fellow Notes
+## Tech Fellow Notes
 
 The core concepts students need to understand is understanding Python syntax, getting familiar with using Claude, and being able to evaluate the starter code logic. Students are most likely to struggle with evaluating the starter logic and comparing it to the expected behavior, using Claude to understand the code in ask mode as well as edit mode, and knowing when to reject suggested changes. I thought AI was pretty helpful in describing the current logic. AI might not be helpful in already noticing bugs and already pointing it out unless you specifically tell AI not to; and if we want students to understand the logic and let them determine if it's a bug. One way I would guide a student without giving the answer would be to have them describe the logic and any bugs, and think out loud on how to identify the bug and/or how to fix it and using Claude in the process too.
