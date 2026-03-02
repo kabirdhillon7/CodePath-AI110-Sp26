@@ -55,8 +55,6 @@ def update_score(current_score: int, outcome: str, attempt_number: int):
         return current_score + points
 
     if outcome == "Too High":
-        if attempt_number % 2 == 0:
-            return current_score + 5
         return current_score - 5
 
     if outcome == "Too Low":
@@ -113,13 +111,6 @@ st.info(
     f"Guess a number between 1 and 100. "
     f"Attempts left: {attempt_limit - st.session_state.attempts}"
 )
-
-with st.expander("Developer Debug Info"):
-    st.write("Secret:", st.session_state.secret)
-    st.write("Attempts:", st.session_state.attempts)
-    st.write("Score:", st.session_state.score)
-    st.write("Difficulty:", difficulty)
-    st.write("History:", st.session_state.history)
 
 with st.form("guess_form"):
     raw_guess = st.text_input(
@@ -191,6 +182,13 @@ if submit:
 
 if show_hint and st.session_state.last_hint:
     st.warning(st.session_state.last_hint)
+
+with st.expander("Developer Debug Info"):
+    st.write("Secret:", st.session_state.secret)
+    st.write("Attempts:", st.session_state.attempts)
+    st.write("Score:", st.session_state.score)
+    st.write("Difficulty:", difficulty)
+    st.write("History:", st.session_state.history)
 
 st.divider()
 st.caption("Built by an AI that claims this code is production-ready.")
