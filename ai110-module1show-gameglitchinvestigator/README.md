@@ -36,3 +36,6 @@ It wrote the code, ran away, and now the game is unplayable.
 ## 🚀 Stretch Features
 
 - [ ] [If you choose to complete Challenge 4, insert a screenshot of your Enhanced Game UI here]
+
+## Hint for Students
+A guiding hint I would give students is to first find bugs by playing the game, understand the logic, leave a TODO note, and then fix each bug one-by-one.
