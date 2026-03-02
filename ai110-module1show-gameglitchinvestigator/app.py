@@ -146,6 +146,10 @@ if submit:
 
     ok, guess_int, err = parse_guess(raw_guess)
 
+    if ok and (guess_int < low or guess_int > high):
+        ok = False
+        err = f"Please enter a number between {low} and {high}."
+
     if not ok:
         st.session_state.history.append(raw_guess)
         st.error(err)
