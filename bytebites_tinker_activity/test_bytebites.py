@@ -161,3 +161,99 @@ class TestCustomer:
         t.add_item(soda)
         c.add_transaction(t)
         assert c.is_verified() is True
+
+
+# ---------------------------------------------------------------------------
+# Edge Cases — Transaction
+# ---------------------------------------------------------------------------
+
+class TestTransactionEdgeCases:
+    def test_compute_total_single_item(self, burger):
+        t = Transaction()
+        t.add_item(burger)
+        assert t.compute_total() == pytest.approx(burger.price)
+
+    def test_compute_total_many_items(self, burger, soda, juice, brownie):
+        t = Transaction()
+        for item in [burger, soda, juice, brownie]:
+            t.add_item(item)
+        expected = burger.price + soda.price + juice.price + brownie.price
+        assert t.compute_total() == pytest.approx(expected)
+
+    def test_compute_total_free_item(self, soda):
+        free_item = FoodItem("Water Cup", 0.0, "Drinks", 3.0)
+        t = Transaction()
+        t.add_item(soda)
+        t.add_item(free_item)
+        assert t.compute_total() == pytest.approx(soda.price)
+
+    def test_get_item_count_empty(self):
+        t = Transaction()
+        assert t.get_item_count() == 0
+
+    def test_get_item_count_single(self, burger):
+        t = Transaction()
+        t.add_item(burger)
+        assert t.get_item_count() == 1
+
+
+# ---------------------------------------------------------------------------
+# Edge Cases — Menu
+# ---------------------------------------------------------------------------
+
+class TestMenuEdgeCases:
+    def test_filter_empty_menu(self):
+        m = Menu()
+        assert m.filter_by_category("Drinks") == []
+
+    def test_filter_single_match(self, burger):
+        m = Menu()
+        m.add_item(burger)
+        result = m.filter_by_category("Burgers")
+        assert len(result) == 1
+        assert result[0] is burger
+
+    def test_filter_all_caps_category(self, soda, juice):
+        m = Menu()
+        m.add_item(soda)
+        m.add_item(juice)
+        result = m.filter_by_category("DRINKS")
+        assert len(result) == 2
+
+    def test_sort_price_empty_menu(self):
+        m = Menu()
+        assert m.sort_by_price() == []
+
+    def test_sort_popularity_empty_menu(self):
+        m = Menu()
+        assert m.sort_by_popularity() == []
+
+    def test_sort_price_single_item(self, burger):
+        m = Menu()
+        m.add_item(burger)
+        result = m.sort_by_price()
+        assert result == [burger]
+
+
+# ---------------------------------------------------------------------------
+# Edge Cases — Customer
+# ---------------------------------------------------------------------------
+
+class TestCustomerEdgeCases:
+    def test_get_total_spent_no_transactions(self):
+        c = Customer("Alice")
+        assert c.get_total_spent() == 0.0
+
+    def test_get_total_spent_single_transaction(self, burger, soda):
+        c = Customer("Alice")
+        t = Transaction()
+        t.add_item(burger)
+        t.add_item(soda)
+        c.add_transaction(t)
+        assert c.get_total_spent() == pytest.approx(burger.price + soda.price)
+
+    def test_get_total_spent_empty_transaction(self):
+        c = Customer("Alice")
+        t = Transaction()  # no items
+        c.add_transaction(t)
+        assert c.get_total_spent() == 0.0
