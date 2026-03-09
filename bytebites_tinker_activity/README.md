@@ -28,3 +28,5 @@ pytest test_bytebites.py -v
 ```
 
 ## TF Notes
+
+The core concept students need to understand include being able to review class relations from a spec and some basic system design concepts. Students may struggle with the system design part if it's the first time (class relations, know where to start, what an acceptable system does looks like), setting up their Copilot agent if they have one, and testing for edge cases (recognizing some and then using AI to develop the tests). AI was pretty helpful in this tinker. One way I can guide a student without giving the answer is encouraging them to think about the spec, making it relatable to real life experiences (what's something you'd need to order from a food check out console), and asking them about edge cases bringing it back to the spec. Also getting them to review tests and ensure it matches the spec.
