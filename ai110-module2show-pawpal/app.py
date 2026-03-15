@@ -1,12 +1,12 @@
 import streamlit as st
-from pawpal_system import Owner, Pet, Task, Scheduler
+from pawpal_system import Pet, Task, Scheduler, save_state, load_state
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
 st.title("🐾 PawPal+")
 
-# --- Session State ---
-if "owner" not in st.session_state:
-    st.session_state.owner = Owner(name="", available_minutes=60, preferences=[])
+# --- Session State (Fix 2: load from disk on first run) ---
+if "owner" not in st.session_state or not hasattr(st.session_state.owner, "to_dict"):
+    st.session_state.owner = load_state()
 
 owner = st.session_state.owner
 
@@ -22,9 +22,13 @@ with col2:
     )
     owner.available_minutes = int(avail)
 
+# Fix 4: warn when budget is 0
+if owner.available_minutes == 0:
+    st.warning("Available time is 0 — no tasks can be scheduled.")
+
 st.divider()
 
-# ── 2. Add a Pet ─────────────────────────────────────────────────────────────
+# ── 2. Your Pets ──────────────────────────────────────────────────────────────
 st.subheader("Your Pets")
 
 with st.form("add_pet_form", clear_on_submit=True):
@@ -38,19 +42,28 @@ with st.form("add_pet_form", clear_on_submit=True):
     submitted = st.form_submit_button("Add Pet")
 
 if submitted:
-    if pet_name.strip():
+    if not pet_name.strip():
+        st.warning("Please enter a pet name.")
+    # Fix 7: duplicate pet check
+    elif any(p.name.lower() == pet_name.strip().lower() for p in owner.pets):
+        st.warning(f"A pet named '{pet_name.strip()}' already exists.")
+    else:
         new_pet = Pet(name=pet_name.strip(), species=species, age=int(age), needs=[])
         owner.add_pet(new_pet)
+        save_state(owner)  # Fix 2
         st.success(f"Added {new_pet.name} the {new_pet.species}!")
-    else:
-        st.warning("Please enter a pet name.")
 
+# Fix 6: per-pet rows with Remove button instead of st.table
 if owner.pets:
-    pets_data = [
-        {"Name": p.name, "Species": p.species, "Age": p.age, "Tasks": len(p.tasks)}
-        for p in owner.pets
-    ]
-    st.table(pets_data)
+    for pet in list(owner.pets):  # copy so removal mid-loop is safe
+        col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
+        col1.markdown(f"**{pet.name}**")
+        col2.caption(f"{pet.species}, age {pet.age}")
+        col3.caption(f"{len(pet.tasks)} task(s)")
+        if col4.button("Remove", key=f"remove_pet_{id(pet)}"):
+            owner.remove_pet(pet)
+            save_state(owner)  # Fix 2
+            st.rerun()
 else:
     st.info("No pets yet. Add one above.")
 
@@ -92,27 +105,42 @@ else:
                 notes=notes.strip(),
             )
             selected_pet.add_task(new_task)
+            save_state(owner)  # Fix 2
             st.success(f"Added '{new_task.description}' to {selected_pet.name}.")
         else:
             st.warning("Please enter a task description.")
 
-    # Show each pet's current tasks
+    # Fix 5 & 6: per-task rows with checkbox (mark complete) and remove button
     for pet in owner.pets:
         with st.expander(f"{pet.name}'s tasks ({len(pet.tasks)})"):
-            if pet.tasks:
-                tasks_data = [
-                    {
-                        "Description": t.description,
-                        "Minutes": t.duration_minutes,
-                        "Priority": t.priority,
-                        "Frequency": t.frequency,
-                        "Done": t.completed,
-                    }
-                    for t in pet.tasks
-                ]
-                st.table(tasks_data)
-            else:
+            if not pet.tasks:
                 st.caption("No tasks yet.")
+            for task in list(pet.tasks):
+                col1, col2, col3 = st.columns([5, 1, 1])
+                with col1:
+                    label = f"~~{task.description}~~" if task.completed else task.description
+                    st.markdown(
+                        f"**{label}** · {task.duration_minutes} min · "
+                        f"`{task.priority}` · {task.frequency}"
+                    )
+                    if task.notes:
+                        st.caption(task.notes)
+                with col2:
+                    # Fix 5: completion checkbox
+                    done = st.checkbox(
+                        "Done", value=task.completed,
+                        key=f"done_{id(task)}", label_visibility="collapsed"
+                    )
+                    if done != task.completed:
+                        task.mark_complete() if done else task.mark_incomplete()
+                        save_state(owner)  # Fix 2
+                        st.rerun()
+                with col3:
+                    # Fix 6: remove task button
+                    if st.button("🗑", key=f"remove_task_{id(task)}"):
+                        pet.remove_task(task)
+                        save_state(owner)  # Fix 2
+                        st.rerun()
 
 st.divider()
 
@@ -122,17 +150,22 @@ st.subheader("Today's Schedule")
 if not owner.pets or not owner.get_all_tasks():
     st.info("Add at least one pet and one task to generate a schedule.")
 else:
+    # Fix 8: button only triggers the computation; rendering is driven by session state
     if st.button("Generate Schedule"):
         scheduler = Scheduler(owner)
-        # result = scheduler.explain_schedule()
-        # st.text(result)
         scheduled = scheduler.generate_schedule()
-        all_incomplete = scheduler.get_incomplete_tasks()
-        excluded = [t for t in all_incomplete if id(t) not in {id(s) for s in scheduled}]
-        time_used = sum(t.duration_minutes for t in scheduled)
-        time_remaining = owner.available_minutes - time_used
+        st.session_state.last_schedule_ids = [id(t) for t in scheduled]
+        st.session_state.last_schedule_budget = owner.available_minutes
 
-        # Time summary
+    # Fix 8: render from session state so it survives reruns
+    if "last_schedule_ids" in st.session_state:
+        id_set = set(st.session_state.last_schedule_ids)
+        scheduled = [t for t in owner.get_all_tasks() if id(t) in id_set]
+        all_incomplete = [t for t in owner.get_all_tasks() if not t.completed]
+        excluded = [t for t in all_incomplete if id(t) not in id_set]
+        time_used = sum(t.duration_minutes for t in scheduled)
+        time_remaining = st.session_state.last_schedule_budget - time_used
+
         col1, col2, col3 = st.columns(3)
         col1.metric("Tasks Scheduled", len(scheduled))
         col2.metric("Time Used", f"{time_used} min")
@@ -140,23 +173,27 @@ else:
 
         st.divider()
 
-        # Scheduled tasks
+        priority_style = {
+            "high":   ("🔴", st.error),
+            "medium": ("🟡", st.warning),
+            "low":    ("🟢", st.info),
+        }
+
         if not scheduled:
             st.warning("No tasks fit within the available time budget.")
         else:
-            priority_style = {
-                "high":   ("🔴", st.error),
-                "medium": ("🟡", st.warning),
-                "low":    ("🟢", st.info),
-            }
             for task in scheduled:
                 emoji, container = priority_style.get(task.priority, ("🟢", st.info))
-                with container(f"**{emoji} {task.description}**  ·  {task.duration_minutes} min  ·  {task.frequency}", icon=None):
+                with container(
+                    f"**{emoji} {task.description}**  ·  {task.duration_minutes} min  ·  {task.frequency}",
+                    icon=None,
+                ):
                     if task.notes:
                         st.caption(task.notes)
 
-        # Excluded tasks
         if excluded:
             with st.expander(f"Excluded tasks ({len(excluded)}) — didn't fit in time budget"):
                 for task in excluded:
-                    st.markdown(f"- **{task.description}** ({task.duration_minutes} min, {task.priority} priority)")
+                    st.markdown(
+                        f"- **{task.description}** ({task.duration_minutes} min, {task.priority} priority)"
+                    )
