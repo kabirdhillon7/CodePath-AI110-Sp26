@@ -132,8 +132,11 @@ else:
                         key=f"done_{id(task)}", label_visibility="collapsed"
                     )
                     if done != task.completed:
-                        task.mark_complete() if done else task.mark_incomplete()
-                        save_state(owner)  # Fix 2
+                        if done:
+                            pet.complete_task(task)  # marks done + auto-creates next occurrence
+                        else:
+                            task.mark_incomplete()
+                        save_state(owner)
                         st.rerun()
                 with col3:
                     # Fix 6: remove task button

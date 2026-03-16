@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 PRIORITY_RANK: dict[str, int] = {"high": 0, "medium": 1, "low": 2}
@@ -25,6 +25,7 @@ class Task:
         category: str,
         notes: str,
         completed: bool = False,
+        due_date: date | None = None,
     ) -> None:
         self.description = description
         self.duration_minutes = duration_minutes
@@ -33,12 +34,16 @@ class Task:
         self.category = category
         self.notes = notes
         self.completed = completed
-        self.last_completed_date: date | None = None  # Fix 1: track when last done
+        self.last_completed_date: date | None = None
+        self.due_date: date | None = due_date  # when this occurrence is next due
 
     # --- Fix 1: frequency-aware scheduling ---
 
     def should_schedule_today(self) -> bool:
         """Return True if this task is due to appear in today's schedule."""
+        if self.due_date is not None:
+            return self.due_date <= date.today()
+        # Fallback for legacy tasks that predate due_date
         if self.frequency in ("daily", "as_needed"):
             return True
         if self.frequency == "weekly":
@@ -46,6 +51,29 @@ class Task:
                 return True
             return (date.today() - self.last_completed_date).days >= 7
         return True
+
+    def next_occurrence(self) -> Task | None:
+        """Return a fresh, incomplete copy of this task due on its next occurrence.
+
+        Returns None for 'as_needed' tasks (no predictable cadence).
+        timedelta(days=1) advances by exactly one day; timedelta(days=7) by one week.
+        """
+        if self.frequency == "daily":
+            next_due = date.today() + timedelta(days=1)
+        elif self.frequency == "weekly":
+            next_due = date.today() + timedelta(days=7)
+        else:  # "as_needed"
+            return None
+        return Task(
+            description=self.description,
+            duration_minutes=self.duration_minutes,
+            priority=self.priority,
+            frequency=self.frequency,
+            category=self.category,
+            notes=self.notes,
+            completed=False,
+            due_date=next_due,
+        )
 
     def is_high_priority(self) -> bool:
         return _normalize_priority(self.priority) == "high"
@@ -71,6 +99,9 @@ class Task:
             "last_completed_date": (
                 self.last_completed_date.isoformat() if self.last_completed_date else None
             ),
+            "due_date": (
+                self.due_date.isoformat() if self.due_date else None
+            ),
         }
 
     @classmethod
@@ -81,6 +112,8 @@ class Task:
         )
         if d.get("last_completed_date"):
             t.last_completed_date = date.fromisoformat(d["last_completed_date"])
+        if d.get("due_date"):
+            t.due_date = date.fromisoformat(d["due_date"])
         return t
 
 
@@ -106,6 +139,13 @@ class Pet:
 
     def get_tasks(self) -> list[Task]:
         return list(self.tasks)
+
+    def complete_task(self, task: Task) -> None:
+        """Mark task complete and append the next occurrence if it recurs."""
+        task.mark_complete()
+        next_task = task.next_occurrence()
+        if next_task is not None:
+            self.add_task(next_task)
 
     # --- Fix 2: serialization ---
 
