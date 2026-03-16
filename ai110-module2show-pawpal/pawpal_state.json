@@ -2,34 +2,5 @@
   "name": "Kabir",
   "available_minutes": 60,
   "preferences": [],
-  "pets": [
-    {
-      "name": "Kenzo",
-      "species": "dog",
-      "age": 4,
-      "needs": [],
-      "tasks": [
-        {
-          "description": "Morning walk",
-          "duration_minutes": 20,
-          "priority": "high",
-          "frequency": "daily",
-          "category": "walk",
-          "notes": "",
-          "completed": true,
-          "last_completed_date": "2026-03-15"
-        },
-        {
-          "description": "Evening walk",
-          "duration_minutes": 20,
-          "priority": "high",
-          "frequency": "daily",
-          "category": "walk",
-          "notes": "",
-          "completed": false,
-          "last_completed_date": null
-        }
-      ]
-    }
-  ]
+  "pets": []
 }
