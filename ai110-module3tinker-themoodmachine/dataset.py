@@ -50,6 +50,14 @@ SAMPLE_POSTS = [
     "This is fine",
     "So excited for the weekend",
     "I am not happy about this",
+    "Lowkey stressed but kind of proud of myself",
+    "No cap this was the best meal I've ever had 😂",
+    "I absolutely love getting stuck in traffic 💀",
+    "Today is okay I guess",
+    "Highkey obsessed with this new album 🥲",
+    "Just woke up :) but already tired :(",
+    "Everything is fine. Totally fine. Nothing is wrong.",
+    "Meh",
 ]
 
 # Human labels for each post above.
@@ -65,9 +73,17 @@ TRUE_LABELS = [
     "neutral",   # "This is fine"
     "positive",  # "So excited for the weekend"
     "negative",  # "I am not happy about this"
+    "mixed",     # "Lowkey stressed but kind of proud of myself"
+    "positive",  # "No cap this was the best meal I've ever had 😂"
+    "negative",  # "I absolutely love getting stuck in traffic 💀" (sarcasm)
+    "neutral",   # "Today is okay I guess"
+    "positive",  # "Highkey obsessed with this new album 🥲" (edge case: 🥲 is ambiguous)
+    "mixed",     # "Just woke up :) but already tired :("
+    "negative",  # "Everything is fine. Totally fine. Nothing is wrong." (sarcasm)
+    "neutral",   # "Meh"
 ]
 
-# TODO: Add 5-10 more posts and labels.
+# NOTE: Added 8 posts above covering slang, emojis, sarcasm, and ambiguous feelings.
 #
 # Requirements:
 #   - For every new post you add to SAMPLE_POSTS, you must add one
