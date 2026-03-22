@@ -58,6 +58,14 @@ SAMPLE_POSTS = [
     "Just woke up :) but already tired :(",
     "Everything is fine. Totally fine. Nothing is wrong.",
     "Meh",
+    # --- Breaker sentences: designed to confuse the rule-based model ---
+    "I love getting stuck in traffic",           # sarcasm: "love" fires positive
+    "Wow amazing, my flight got cancelled",      # sarcasm: "amazing" fires positive
+    "That movie was absolutely sick!",           # slang: "sick" = cool, not in word list
+    "This beat is fire 🔥",                      # slang + emoji not in signal_scores
+    "I'm fine 🙂",                               # passive-aggressive: 🙂 not scored
+    "I hate that I love this show",              # cancel-out: hate(−2) + love(+2) = 0
+    "I'm exhausted but proud of what I did today",  # vocab gap: neither word in lists
 ]
 
 # Human labels for each post above.
@@ -81,6 +89,14 @@ TRUE_LABELS = [
     "mixed",     # "Just woke up :) but already tired :("
     "negative",  # "Everything is fine. Totally fine. Nothing is wrong." (sarcasm)
     "neutral",   # "Meh"
+    # --- Breaker sentence labels ---
+    "negative",  # "I love getting stuck in traffic"  (model predicts: positive)
+    "negative",  # "Wow amazing, my flight got cancelled"  (model predicts: positive)
+    "positive",  # "That movie was absolutely sick!"  (model predicts: neutral)
+    "positive",  # "This beat is fire 🔥"  (model predicts: neutral)
+    "negative",  # "I'm fine 🙂"  (model predicts: neutral)
+    "mixed",     # "I hate that I love this show"  (model predicts: neutral)
+    "mixed",     # "I'm exhausted but proud of what I did today"  (model predicts: neutral)
 ]
 
 # TODO: Add 5-10 more posts and labels.
