@@ -24,7 +24,7 @@ The course runs across five modules, progressing from foundational debugging and
 ## Activities
 
 | Activity | Type | Focus |
-|--------|----------|------|-------|
+|----------|------|-------|
 | [Playlist Chaos](ai110-module1tinker-playlistchaos/) | Tinker | Debug a Streamlit playlist generator with intentional bugs; practice AI-assisted code investigation |
 | [Game Glitch Investigator](ai110-module1show-gameglitchinvestigator/) | Show | Fix a broken number guessing game; refactor logic into a testable module and get all tests passing |
 | [ByteBites](bytebites_tinker_activity/) | Tinker | Spec-driven OOP design for a food ordering backend; implement model classes and a full test suite |
