@@ -9,6 +9,7 @@ This class starts with very simple logic:
   - Convert that score into a mood label
 """
 
+import re
 from typing import List, Dict, Tuple, Optional
 
 from dataset import POSITIVE_WORDS, NEGATIVE_WORDS
@@ -52,9 +53,24 @@ class MoodAnalyzer:
           - Handle simple emojis separately (":)", ":-(", "🥲", "😂")
           - Normalize repeated characters ("soooo" -> "soo")
         """
-        cleaned = text.strip().lower()
-        tokens = cleaned.split()
+        text = text.strip().lower()
 
+        # 1. Extract text emoticons before punctuation removal (e.g. ":)", ":-(")
+        emoticon_pattern = r'[:;=8][-o*]?[)\](\[dDpP/\\:}{@|]'
+        emoticons = re.findall(emoticon_pattern, text)
+        text = re.sub(emoticon_pattern, ' ', text)
+
+        # 2. Remove remaining punctuation so "love," matches "love"
+        text = re.sub(r'[^\w\s]', ' ', text)
+
+        # 3. Split and normalize repeated characters ("soooo" -> "soo")
+        tokens = text.split()
+        tokens = [re.sub(r'(.)\1{2,}', r'\1\1', t) for t in tokens]
+
+        # 4. Re-add emoticons as their own tokens
+        tokens += emoticons
+
+        print(f"[preprocess] tokens: {tokens}")
         return tokens
 
     # ---------------------------------------------------------------------
