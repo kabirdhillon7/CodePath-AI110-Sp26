@@ -33,6 +33,18 @@ class MoodAnalyzer:
         self.positive_words = set(w.lower() for w in positive_words)
         self.negative_words = set(w.lower() for w in negative_words)
 
+        # Words that carry stronger sentiment get a weight of 2; others default to 1.
+        self.positive_weights = {"love": 2, "amazing": 2, "awesome": 2, "excited": 2}
+        self.negative_weights = {"hate": 2, "terrible": 2, "awful": 2, "angry": 2}
+
+        # Emoji and slang tokens mapped directly to score deltas.
+        self.signal_scores = {
+            ":)": 2,  ":d": 2,  ":p": 1,
+            ":(": -2, ":-(": -2,
+            "😂": 1,  "🥲": -1, "💀": -2,
+            "lol": 1,
+        }
+
     # ---------------------------------------------------------------------
     # Preprocessing
     # ---------------------------------------------------------------------
@@ -91,15 +103,39 @@ class MoodAnalyzer:
           - Give some words higher weights than others (for example "hate" < "annoyed")
           - Treat emojis or slang (":)", "lol", "💀") as strong signals
         """
-        # TODO: Implement this method.
-        #   1. Call self.preprocess(text) to get tokens.
-        #   2. Loop over the tokens.
-        #   3. Increase the score for positive words, decrease for negative words.
-        #   4. Return the total score.
-        #
-        # Hint: if you implement negation, you may want to look at pairs of tokens,
-        # like ("not", "happy") or ("never", "fun").
-        pass
+        tokens = self.preprocess(text)
+        score = 0
+        negation_words = {"not", "never", "no"}
+        negated = False
+
+        for token in tokens:
+            # Improvement 4: emoji/slang — strong fixed signals, not affected by negation
+            if token in self.signal_scores:
+                score += self.signal_scores[token]
+                negated = False
+                continue
+
+            # Improvement 1: negation — set flag, consume on next sentiment word
+            if token in negation_words:
+                negated = True
+                continue
+
+            # Improvement 3: word weights — strong words count more than weak ones
+            weight = 0
+            if token in self.positive_words:
+                weight += self.positive_weights.get(token, 1)
+            if token in self.negative_words:
+                weight -= self.negative_weights.get(token, 1)
+
+            # Improvement 1 (continued): flip contribution if negated
+            if negated and weight != 0:
+                weight = -weight
+                negated = False  # consume negation after first sentiment word
+
+            # Improvement 2: frequency — each occurrence of a word is counted
+            score += weight
+
+        return score
 
     # ---------------------------------------------------------------------
     # Label prediction
