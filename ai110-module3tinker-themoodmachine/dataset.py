@@ -83,6 +83,7 @@ TRUE_LABELS = [
     "neutral",   # "Meh"
 ]
 
+# TODO: Add 5-10 more posts and labels.
 # NOTE: Added 8 posts above covering slang, emojis, sarcasm, and ambiguous feelings.
 #
 # Requirements:
