@@ -67,4 +67,5 @@ During this lab you will:
 - Try examples that mislead or confuse your model. Failure cases teach you the most.
 
 ## TF Notes
+
 The core concepts students need to understand is string parsing, dictionaries, and use a scoring pattern (matching words with a positive/negative/neutral rating). Students are likely to struggle on part 2 with updating score_text and predict_label. Additonally, student may take some more time on part 2 and part 3 given it may take some time to compare the predicted and actual result for the breaker sentence and being able to find the logic error. AI is helpful in running main.py when we add post sentences, and can be misleading if not given enough context for making updates to mood analyzer. One way I would guide a student is asking them to use AI to understand the current logic, and help them articulate the change they want to make in logic behavior.
