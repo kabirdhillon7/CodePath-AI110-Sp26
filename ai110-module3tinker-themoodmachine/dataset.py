@@ -23,6 +23,7 @@ POSITIVE_WORDS = [
     "chill",
     "relaxed",
     "amazing",
+    "proud",      # "I'm exhausted but proud of what I did today"
 ]
 
 NEGATIVE_WORDS = [
@@ -36,6 +37,9 @@ NEGATIVE_WORDS = [
     "stressed",
     "hate",
     "boring",
+    "exhausted",  # "I'm exhausted but proud of what I did today"
+    "stuck",      # "I love getting stuck in traffic" (partial sarcasm fix)
+    "cancelled",  # "Wow amazing, my flight got cancelled" (partial sarcasm fix)
 ]
 
 # ---------------------------------------------------------------------

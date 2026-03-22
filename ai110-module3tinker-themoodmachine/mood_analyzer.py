@@ -43,6 +43,8 @@ class MoodAnalyzer:
             ":(": -2, ":-(": -2,
             "😂": 1,  "🥲": -1, "💀": -2,
             "lol": 1,
+            "sick": 2, "fire": 2, "lit": 1,  # slang positives
+            "🔥": 2,                           # fire emoji
         }
 
     # ---------------------------------------------------------------------
@@ -89,52 +91,67 @@ class MoodAnalyzer:
     # Scoring logic
     # ---------------------------------------------------------------------
 
-    def score_text(self, text: str) -> int:
+    def _compute_score(self, tokens: List[str]) -> Tuple[int, bool, bool]:
         """
-        Compute a numeric "mood score" for the given text.
+        Core scoring logic shared by score_text and predict_label.
 
-        Positive words increase the score.
-        Negative words decrease the score.
-
-        TODO: You must choose AT LEAST ONE modeling improvement to implement.
-        For example:
-          - Handle simple negation such as "not happy" or "not bad"
-          - Count how many times each word appears instead of just presence
-          - Give some words higher weights than others (for example "hate" < "annoyed")
-          - Treat emojis or slang (":)", "lol", "💀") as strong signals
+        Returns (score, has_positive, has_negative) so callers can detect
+        conflicting signals (both positive and negative fired) even when
+        they cancel out to a net score of zero.
         """
-        tokens = self.preprocess(text)
         score = 0
+        has_positive = False
+        has_negative = False
         negation_words = {"not", "never", "no"}
         negated = False
 
         for token in tokens:
-            # Improvement 4: emoji/slang — strong fixed signals, not affected by negation
+            # Emoji/slang — strong fixed signals, not affected by negation
             if token in self.signal_scores:
-                score += self.signal_scores[token]
+                delta = self.signal_scores[token]
+                score += delta
+                if delta > 0:
+                    has_positive = True
+                if delta < 0:
+                    has_negative = True
                 negated = False
                 continue
 
-            # Improvement 1: negation — set flag, consume on next sentiment word
+            # Negation — set flag, consume on next sentiment word
             if token in negation_words:
                 negated = True
                 continue
 
-            # Improvement 3: word weights — strong words count more than weak ones
+            # Word weights — strong words count more than weak ones
             weight = 0
             if token in self.positive_words:
                 weight += self.positive_weights.get(token, 1)
             if token in self.negative_words:
                 weight -= self.negative_weights.get(token, 1)
 
-            # Improvement 1 (continued): flip contribution if negated
+            # Flip contribution if negated
             if negated and weight != 0:
                 weight = -weight
                 negated = False  # consume negation after first sentiment word
 
-            # Improvement 2: frequency — each occurrence of a word is counted
+            # Frequency — each occurrence of a word is counted
+            if weight > 0:
+                has_positive = True
+            if weight < 0:
+                has_negative = True
             score += weight
 
+        return score, has_positive, has_negative
+
+    def score_text(self, text: str) -> int:
+        """
+        Compute a numeric "mood score" for the given text.
+
+        Positive words increase the score.
+        Negative words decrease the score.
+        """
+        tokens = self.preprocess(text)
+        score, _, _ = self._compute_score(tokens)
         return score
 
     # ---------------------------------------------------------------------
@@ -157,13 +174,17 @@ class MoodAnalyzer:
         Just remember that whatever labels you return should match the labels
         you use in TRUE_LABELS in dataset.py if you care about accuracy.
         """
-        score = self.score_text(text)
+        tokens = self.preprocess(text)
+        score, has_positive, has_negative = self._compute_score(tokens)
 
         if score >= 2:
             return "positive"
         if score <= -2:
             return "negative"
         if score == 0:
+            # Both sides fired and cancelled out → conflicting sentiment, not neutral
+            if has_positive and has_negative:
+                return "mixed"
             return "neutral"
         return "mixed"  # score == +1 or -1: weak or conflicting signals
 
