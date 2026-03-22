@@ -2,7 +2,7 @@
 
 ## About This Repository
 
-This repository contains my completed work for every **tinker** and **show** activity in CodePath's AI110 course. As a Tech Fellow, I work through each activity before it's introduced in class — running the code, hitting the same edge cases students will encounter, and building a hands-on mental model of the material. During class, I draw on that direct experience to help students debug, reason through design decisions, and evaluate the AI-generated output they're working with.
+This repository contains my completed work for **tinker** and **show** activity in CodePath's AI110 course. As a Tech Fellow, I work through each activity before it's introduced in class — running the code, hitting the same edge cases students will encounter, and building a hands-on mental model of the material. During class, I draw on that direct experience to help students debug, reason through design decisions, and evaluate the AI-generated output they're working with.
 
 Think of it as the preparation work that lets me mentor effectively rather than advise from a distance.
 
@@ -23,10 +23,10 @@ The course runs across five modules, progressing from foundational debugging and
 
 ## Activities
 
-| Module | Activity | Type | Focus |
+| Activity | Type | Focus |
 |--------|----------|------|-------|
-| 1 | [Playlist Chaos](ai110-module1tinker-playlistchaos/) | Tinker | Debug a Streamlit playlist generator with intentional bugs; practice AI-assisted code investigation |
-| 1 | [Game Glitch Investigator](ai110-module1show-gameglitchinvestigator/) | Show | Fix a broken number guessing game; refactor logic into a testable module and get all tests passing |
-| 2 | [PawPal+](ai110-module2show-pawpal/) | Show | Design and implement a pet care scheduling system from a written spec using OOP and Streamlit |
-| 3 | [The Mood Machine](ai110-module3tinker-themoodmachine/) | Tinker | Build and compare a rule-based sentiment classifier vs. a scikit-learn ML model; document findings in a model card |
-| — | [ByteBites](bytebites_tinker_activity/) | Tinker | Spec-driven OOP design for a food ordering backend; implement model classes and a full test suite |
+| [Playlist Chaos](ai110-module1tinker-playlistchaos/) | Tinker | Debug a Streamlit playlist generator with intentional bugs; practice AI-assisted code investigation |
+| [Game Glitch Investigator](ai110-module1show-gameglitchinvestigator/) | Show | Fix a broken number guessing game; refactor logic into a testable module and get all tests passing |
+| [ByteBites](bytebites_tinker_activity/) | Tinker | Spec-driven OOP design for a food ordering backend; implement model classes and a full test suite |
+| [PawPal+](ai110-module2show-pawpal/) | Show | Design and implement a pet care scheduling system from a written spec using OOP and Streamlit |
+| [The Mood Machine](ai110-module3tinker-themoodmachine/) | Tinker | Build and compare a rule-based sentiment classifier vs. a scikit-learn ML model; document findings in a model card |
