@@ -14,7 +14,8 @@ from recommender import load_songs, recommend_songs
 
 def main() -> None:
     songs = load_songs("data/songs.csv") 
-
+    print(f"Loaded {len(songs)} songs from the dataset."
+          )
     # Taste profile: target values for all song features
     user_prefs = {
         "favorite_genre": "pop",
