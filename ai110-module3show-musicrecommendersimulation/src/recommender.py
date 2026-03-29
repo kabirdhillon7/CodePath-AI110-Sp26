@@ -108,7 +108,7 @@ def score_song(user_prefs: UserProfile, song: Song) -> Tuple[float, List[str]]:
     return round(score, 2), reasons
 
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
+def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, List[str]]]:
     """
     Functional implementation of the recommendation logic.
     Required by src/main.py
@@ -139,7 +139,7 @@ def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tup
             acousticness=song_dict["acousticness"],
         )
         points, reasons = score_song(user, song)
-        return song_dict, points, ", ".join(reasons)
+        return song_dict, points, reasons
 
     ranked = sorted((_score(s) for s in songs), key=lambda x: x[1], reverse=True)
     return ranked[:k]
