@@ -39,12 +39,12 @@ class Recommender:
         self.songs = songs
 
     def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
-        # TODO: Implement recommendation logic
-        return self.songs[:k]
+        ranked = sorted(self.songs, key=lambda song: score_song(user, song)[0], reverse=True)
+        return ranked[:k]
 
     def explain_recommendation(self, user: UserProfile, song: Song) -> str:
-        # TODO: Implement explanation logic
-        return "Explanation placeholder"
+        _, reasons = score_song(user, song)
+        return ", ".join(reasons)
 
 def load_songs(csv_path: str) -> List[Dict]:
     """
