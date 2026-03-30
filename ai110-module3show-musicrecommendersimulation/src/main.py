@@ -9,7 +9,7 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
-from recommender import load_songs, recommend_songs
+from recommender import load_songs, recommend_songs, detect_contradictions
 
 
 def main() -> None:
@@ -66,6 +66,11 @@ def main() -> None:
         print(f"\n{'#' * 44}")
         print(f"  Profile: {profile_name}")
         print(f"{'#' * 44}")
+
+        warnings = detect_contradictions(user_prefs)
+        for w in warnings:
+            print(f"\n  ⚠ WARNING: {w}")
+
         print("\nTop recommendations:\n")
         for rank, (song, score, reasons) in enumerate(recommendations, start=1):
             print(divider)
