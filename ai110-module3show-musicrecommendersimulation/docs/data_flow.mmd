@@ -1,0 +1,20 @@
+flowchart TD
+    A([UserProfile\nfavorite_genre, favorite_mood\ntarget_energy, likes_acoustic]) --> C
+    B([songs.csv]) --> B1[load_songs] --> B2[(Song objects)]
+
+    B2 --> C[recommend]
+    C --> D{For each Song\nin songs list}
+
+    D --> E1[genre_score\n1.0 if genre matches\nelse 0.0]
+    D --> E2[mood_score\n1.0 if mood matches\nelse 0.0]
+    D --> E3[energy_score\n1 - abs song.energy\n- user.target_energy]
+    D --> E4[acoustic_score\nsong.acousticness if likes_acoustic\nelse 1 - song.acousticness]
+
+    E1 & E2 & E3 & E4 --> F[weighted sum\n0.40 x mood + 0.25 x genre\n+ 0.25 x energy + 0.10 x acoustic]
+    F --> G[(song, score) pair]
+    G -->|next song| D
+
+    G --> H[Collect all\nsong, score pairs]
+    H --> I[Sort descending\nby score]
+    I --> J[Slice top K]
+    J --> K([Top K Song objects\nreturned to caller])
