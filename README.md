@@ -30,3 +30,5 @@ The course runs across five modules, progressing from foundational debugging and
 | [ByteBites](bytebites_tinker_activity/) | Tinker | Spec-driven OOP design for a food ordering backend; implement model classes and a full test suite |
 | [PawPal+](ai110-module2show-pawpal/) | Show | Design and implement a pet care scheduling system from a written spec using OOP and Streamlit |
 | [The Mood Machine](ai110-module3tinker-themoodmachine/) | Tinker | Build and compare a rule-based sentiment classifier vs. a scikit-learn ML model; document findings in a model card |
+| [Music Recommender Simulation](ai110-module3show-musicrecommendersimulation/) | Show | Design and implement a song recommender system using scored user taste profiles; evaluate bias and limitations in a model card |
+| [DocuBot](ai110-module4tinker-docubot/) | Tinker | Build a documentation assistant with three modes: naive LLM, retrieval-only, and RAG (Retrieval Augmented Generation) using Gemini |

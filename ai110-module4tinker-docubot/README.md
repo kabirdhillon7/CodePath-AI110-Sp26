@@ -80,3 +80,7 @@ You will primarily work in:
 - Python 3.9+
 - A Gemini API key for LLM features (only needed for modes 1 and 3)
 - No database, no server setup, no external services besides LLM calls
+
+## TF Notes
+
+The core concept students need to understand are file/text parsing, matching words with where that occurence happens in a file, and understanding authentication tokens. Students are most likely to struggle on set-up, and updating the project for retrieval. AI was helpful in help brainstorm edge cases and helping with how to refactor the retrieval logic into paragraphs. AI was also helpful with installing python dependencies (especially in helping debug dependency errors). One way I would guide a student without giving the answer is helping them talk through the logic they want for refactoring the retrieval logic and then translating that into a prompt for Claude Code.
