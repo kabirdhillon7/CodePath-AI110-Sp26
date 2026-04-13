@@ -32,3 +32,4 @@ The course runs across five modules, progressing from foundational debugging and
 | [The Mood Machine](ai110-module3tinker-themoodmachine/) | Tinker | Build and compare a rule-based sentiment classifier vs. a scikit-learn ML model; document findings in a model card |
 | [Music Recommender Simulation](ai110-module3show-musicrecommendersimulation/) | Show | Design and implement a song recommender system using scored user taste profiles; evaluate bias and limitations in a model card |
 | [DocuBot](ai110-module4tinker-docubot/) | Tinker | Build a documentation assistant with three modes: naive LLM, retrieval-only, and RAG (Retrieval Augmented Generation) using Gemini |
+| [Applied AI System — PawPal+](applied-ai-system-project/) | Final Project | Extend PawPal+ into a full applied AI system: Gemini-powered task suggestions, schedule gap analysis, and a conversational care advisor built on top of a deterministic rule-based scheduler |
