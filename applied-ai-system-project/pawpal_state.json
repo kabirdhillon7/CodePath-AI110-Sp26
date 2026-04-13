@@ -2,5 +2,20 @@
   "name": "Kabir",
   "available_minutes": 60,
   "preferences": [],
-  "pets": []
+  "pets": [
+    {
+      "name": "Kenzo",
+      "species": "dog",
+      "age": 4,
+      "needs": [],
+      "tasks": []
+    },
+    {
+      "name": "Mitus",
+      "species": "dog",
+      "age": 3,
+      "needs": [],
+      "tasks": []
+    }
+  ]
 }

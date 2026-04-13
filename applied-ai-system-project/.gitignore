@@ -1,0 +1,13 @@
+# Environment / secrets
+.env
+
+# Runtime state & logs
+pawpal_state.json
+pawpal_ai.log
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
