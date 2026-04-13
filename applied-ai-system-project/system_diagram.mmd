@@ -1,0 +1,50 @@
+flowchart TD
+    User(["👤 User"])
+
+    subgraph UI["Streamlit UI — app.py"]
+        ScheduleTab["Schedule & Tasks Tab"]
+        ChatTab["AI Care Chat Tab"]
+    end
+
+    subgraph Core["PawPal System — pawpal_system.py"]
+        Models["Owner / Pet / Task"]
+        Scheduler["Scheduler"]
+    end
+
+    subgraph AIAdvisor["AI Advisor — ai_advisor.py"]
+        Suggester["Task Suggester\nsuggest_tasks_for_pet()"]
+        Analyzer["Schedule Analyzer\nanalyze_schedule()"]
+        Chat["Chat Advisor\nchat_with_advisor()"]
+    end
+
+    Gemini(["☁️ Gemini API"])
+    State[("pawpal_state.json")]
+    Log["📋 pawpal_ai.log"]
+    HumanApproval{{"✅ Human Review\n— checkbox approval —"}}
+
+    User -->|"add pets & tasks"| ScheduleTab
+    User -->|"ask questions"| ChatTab
+
+    ScheduleTab <-->|"save / load state"| Models
+    Models <-->|"persist"| State
+    ScheduleTab -->|"generate"| Scheduler
+    Scheduler -->|"scheduled + excluded tasks"| ScheduleTab
+
+    ScheduleTab -->|"pet profile"| Suggester
+    Suggester -->|"prompt + context"| Gemini
+    Gemini -->|"structured JSON tasks"| Suggester
+    Suggester -->|"suggested tasks"| HumanApproval
+    HumanApproval -->|"approved tasks only"| Models
+
+    ScheduleTab -->|"schedule state"| Analyzer
+    Analyzer -->|"prompt + context"| Gemini
+    Gemini -->|"markdown insights"| Analyzer
+    Analyzer -->|"recommendations"| ScheduleTab
+
+    ChatTab -->|"question + injected owner context"| Chat
+    Chat -->|"prompt + history"| Gemini
+    Gemini -->|"response"| Chat
+    Chat -->|"answer"| ChatTab
+    ChatTab -->|"display"| User
+
+    AIAdvisor -.->|"log all calls & errors"| Log
