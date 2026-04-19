@@ -47,3 +47,27 @@ def test_mock_client_forces_llm_fallback_to_heuristics_for_analysis():
     assert any(issue.get("type") == "Code Quality" for issue in result["issues"])
     # Ensure we logged the fallback path
     assert any("Falling back to heuristics" in entry.get("message", "") for entry in result["logs"])
+
+
+class ProseFixer(MockClient):
+    """MockClient variant whose fixer returns English prose instead of Python code."""
+
+    def complete(self, system_prompt: str, user_prompt: str) -> str:
+        if "Return ONLY valid JSON" in system_prompt:
+            return super().complete(system_prompt, user_prompt)
+        return "The code looks fine.\nMinor style note: remove print statements."
+
+
+def test_prose_fix_is_blocked_by_format_guardrail():
+    # Failure mode: LLM returns English prose instead of Python code.
+    # With only a low-severity issue and same-length prose output, the old assessor
+    # scored this 95 and set should_autofix=True — applying a sentence as code.
+    # The format guardrail (-40 for no Python syntax in fixed code) must block it.
+    agent = BugHoundAgent(client=ProseFixer())
+    code = "print('hello')\nprint('world')\n"
+
+    result = agent.run(code)
+
+    assert result["risk"]["should_autofix"] is False
+    assert result["risk"]["level"] != "low"
+    assert any("format failure" in r.lower() for r in result["risk"]["reasons"])

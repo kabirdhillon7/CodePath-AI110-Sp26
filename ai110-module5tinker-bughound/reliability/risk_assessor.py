@@ -1,6 +1,15 @@
+import ast
 from typing import Dict, List
 
 RISKY_ADDITIONS = ["exec(", "eval(", "os.system(", "subprocess", "__import__"]
+
+
+def _is_valid_python(code: str) -> bool:
+    try:
+        ast.parse(code)
+        return True
+    except SyntaxError:
+        return False
 
 
 def assess_risk(
@@ -64,6 +73,13 @@ def assess_risk(
     if "except:" in original_code and "except:" not in fixed_code:
         score -= 15
         reasons.append("Bare except was modified — verify control flow correctness.")
+
+    # ----------------------------
+    # Format failure: original parses as Python but fixed does not
+    # ----------------------------
+    if _is_valid_python(original_code) and not _is_valid_python(fixed_code):
+        score -= 40
+        reasons.append("Fixed code appears to contain no Python syntax — possible format failure.")
 
     # ----------------------------
     # Risky addition checks
