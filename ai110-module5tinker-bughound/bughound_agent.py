@@ -193,7 +193,7 @@ class BugHoundAgent:
             issues.append(
                 {
                     "type": str(item.get("type", "Issue")),
-                    "severity": str(item.get("severity", "Unknown")),
+                    "severity": (lambda s: s if s in {"low", "medium", "high"} else "low")(str(item.get("severity", "low")).lower()),
                     "msg": str(item.get("msg", "")).strip(),
                 }
             )

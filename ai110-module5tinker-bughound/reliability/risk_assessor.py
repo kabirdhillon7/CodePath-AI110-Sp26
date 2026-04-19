@@ -1,5 +1,7 @@
 from typing import Dict, List
 
+RISKY_ADDITIONS = ["exec(", "eval(", "os.system(", "subprocess", "__import__"]
+
 
 def assess_risk(
     original_code: str,
@@ -33,10 +35,12 @@ def assess_risk(
     # ----------------------------
     # Issue severity based risk
     # ----------------------------
+    has_high_severity = False
     for issue in issues:
         severity = str(issue.get("severity", "")).lower()
 
         if severity == "high":
+            has_high_severity = True
             score -= 40
             reasons.append("High severity issue detected.")
         elif severity == "medium":
@@ -49,18 +53,26 @@ def assess_risk(
     # ----------------------------
     # Structural change checks
     # ----------------------------
-    if len(fixed_lines) < len(original_lines) * 0.5:
+    if len(fixed_lines) < len(original_lines) * 0.75:
         score -= 20
-        reasons.append("Fixed code is much shorter than original.")
+        reasons.append("Fixed code is significantly shorter than original.")
 
     if "return" in original_code and "return" not in fixed_code:
         score -= 30
         reasons.append("Return statements may have been removed.")
 
     if "except:" in original_code and "except:" not in fixed_code:
-        # This is usually good, but still risky.
-        score -= 5
-        reasons.append("Bare except was modified, verify correctness.")
+        score -= 15
+        reasons.append("Bare except was modified — verify control flow correctness.")
+
+    # ----------------------------
+    # Risky addition checks
+    # ----------------------------
+    for pattern in RISKY_ADDITIONS:
+        if pattern not in original_code and pattern in fixed_code:
+            score -= 25
+            reasons.append(f"Fix introduced potentially dangerous pattern: {pattern}")
+            break
 
     # ----------------------------
     # Clamp score
@@ -78,9 +90,9 @@ def assess_risk(
         level = "high"
 
     # ----------------------------
-    # Auto-fix policy
+    # Auto-fix policy: score must be ≥ 85, level low, and no high-severity issues
     # ----------------------------
-    should_autofix = level == "low"
+    should_autofix = score >= 85 and level == "low" and not has_high_severity
 
     if not reasons:
         reasons.append("No significant risks detected.")
