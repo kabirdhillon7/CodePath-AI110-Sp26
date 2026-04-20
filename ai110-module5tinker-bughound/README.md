@@ -111,12 +111,5 @@ You should see tests covering:
 ---
 
 ## TF Notes
-Submit a short summary added to the README.
-The summary should be 5–7 sentences covering:
-The core concept students needed to understand
-Where students are most likely to struggle
-Where AI was helpful vs misleading
-One way they would guide a student without giving the answer
-
 
 The core concepts students need to understand basic python syntax (for the sample code examples), how to use AI to better understand the logic and then use AI to draft solutions to any logic issues or improvements. They shoud also understand how to set-up an API key using Gemini. Students are mostly likely to struggle on making edits to the analyzer and propose fix methods. AI can be helpful in recognizing logic issues in code and helping brainstorm logic updates. One way I would guide a student is by having them screenshare and compare the heuristics and AI modes, and then describing the updates we want to make the logic evaluation.
